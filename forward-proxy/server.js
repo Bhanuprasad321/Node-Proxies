@@ -2,16 +2,28 @@ const http = require("http");
 
 const server = http.createServer((req, res) => {
   console.log("Incoming request recieved!");
+  try {
+    const targetUrl = new URL(req.url);
 
-  console.log("Method:", req.method);
-  console.log("URL:", req.url);
-  console.log("Headers:", req.headers);
+    const hostname = targetUrl.hostname;
+    const port = targetUrl.port || 80;
+    const path = targetUrl.pathname + targetUrl.search;
 
-  res.writeHead(200, {
-    "Content-Type": "text/plain",
-  });
+    console.log("Hostname:", hostname);
+    console.log("Port:", port);
+    console.log("Path:", path);
 
-  res.end("Hello from our forward proxy!");
+    res.writeHead(200, {
+      "Content-Type": "text/plain",
+    });
+
+    res.end("Destination URL extracted successfully!");
+  } catch (err) {
+    res.writeHead(400, {
+      "content-type": "text/plain",
+    });
+    res.end("Invalid destination URL");
+  }
 });
 
 server.listen(3000, () => {
