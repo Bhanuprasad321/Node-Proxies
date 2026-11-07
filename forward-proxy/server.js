@@ -1,5 +1,7 @@
 const http = require("http");
 const net = require("net");
+const dns = require("dns").promises;
+const ipaddr = require("ipaddr.js");
 const server = http.createServer((req, res) => {
   if (req.method === "CONNECT") {
     const [hostname, port] = req.url.split(":");
@@ -46,7 +48,18 @@ server.on("connect", (req, clientSocket, head) => {
   console.log(`HTTPS tunnel requested: ${hostname}:${port}`);
 
   const serverSocket = net.connect(port, hostname);
+  serverSocket.setTimeout(10000);
+  serverSocket.on("timeout", () => {
+    console.log("Destination connection timed out");
 
+    if (!tunnelEstablished) {
+      clientSocket.end(
+        "HTTP/1.1 504 Gateway Timeout\r\nConnection: close\r\n\r\n",
+      );
+    }
+
+    serverSocket.destroy();
+  });
   let tunnelEstablished = false;
 
   serverSocket.on("connect", () => {
@@ -85,6 +98,7 @@ server.on("connect", (req, clientSocket, head) => {
     serverSocket.destroy();
   });
 });
+
 server.listen(3000, () => {
   console.log("proxy server running on port 3000");
 });
