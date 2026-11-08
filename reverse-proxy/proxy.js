@@ -1,11 +1,26 @@
 const http = require("http");
 
+const backends = [
+  { hostname: "localhost", port: 4000 },
+  { hostname: "localhost", port: 4001 },
+];
+
+function getNextBackend() {
+  //Round-Robin Load Balancer
+  const backend = backends[currentBackend];
+
+  currentBackend = (currentBackend + 1) % backends.length;
+
+  return backend;
+}
+
+let currentBackend = 0;
+
 const proxy = http.createServer((req, res) => {
   console.log("Incoming request:", req.method, req.url);
 
   const options = {
-    hostname: "localhost",
-    port: 4000,
+    ...getNextBackend(),
     path: req.url,
     method: req.method,
     headers: req.headers,

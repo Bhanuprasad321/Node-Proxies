@@ -9,7 +9,7 @@ const backend = http.createServer((req, res) => {
 
   res.end(
     JSON.stringify({
-      message: "Response from Backend Server",
+      message: "Response from Backend Server 1",
       method: req.method,
       path: req.url,
       server: "Backend 1",
@@ -18,5 +18,5 @@ const backend = http.createServer((req, res) => {
 });
 
 backend.listen(4000, () => {
-  console.log("Backend server running on port 4000");
+  console.log("Backend server 1 running on port 4000");
 });
